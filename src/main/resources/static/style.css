@@ -1,0 +1,16 @@
+body{
+    font-family: "JetBrainsMono NFM";
+}
+
+table,tr,th{
+    border-radius: 2px;
+    border-color: black;
+}
+
+button{
+    border-radius: 3px;
+    height: 40px;
+    width: 100px;
+    color: blueviolet;
+    background-color: aquamarine;
+}

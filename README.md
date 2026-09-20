@@ -10,50 +10,52 @@ The system supports a request → approval workflow: users request to borrow, ex
 
 - **Backend:** Java, Spring Boot, Spring Data JPA, Spring Security
 - **Database:** MySQL (Hibernate `ddl-auto=update` for schema management in dev)
-- **Frontend:** HTML, CSS, vanilla JavaScript (`fetch` API)
+- **Frontend:** React (Vite), Lucide-React, modern responsive CSS
 - **Auth:** Session-based authentication with BCrypt password encoding (CSRF currently disabled); a planned future migration to stateless JWT auth is scoped for after core features are complete
 
-## Project Structure
+## Running the Application
 
+### 1. Backend (Spring Boot)
+```bash
+./mvnw spring-boot:run
 ```
-com.mredr.Libraray_management
-├── config          # SecurityConfig
-├── controller       # AdminController, BookController, LibraryController, TransactionController, UserController
-├── model             # Books, Library, TransactionRequest, User, UserPrincipal, enums (RequestType, RequestStatus, Borrowed, Availability)
-├── repo              # BookRepo, LibraryRepo, TransactionRepo, UserRepo
-└── service          # BookService, LibraryService, MyUserDetailsService, TransactionService, UserService
+Runs the Spring Boot server on `http://localhost:8080`. When running standalone, it serves the compiled React application directly from `src/main/resources/static`.
+
+### 2. Frontend Development Server (Vite)
+```bash
+cd frontend
+npm install
+npm run dev
 ```
+Runs the Vite development server on `http://localhost:5173` with hot module replacement (HMR) and automatic API proxying to `http://localhost:8080`.
 
-## Core Domain Model
+### 3. Frontend Production Build
+```bash
+cd frontend
+npm run build
+```
+Builds and outputs production-optimized bundles directly into `src/main/resources/static/`.
 
-- **`User`** — application users, with roles (e.g. `USER`, `ADMIN`/`LIBRARIAN`)
-- **`Books`** — catalog items with stock count and availability status
-- **`TransactionRequest`** — a user-submitted request (`BORROW`, `EXTEND`, or `RETURN`) with a status (`PENDING`, `ACCEPTED`, `REJECTED`)
-- **`Library`** — the actual borrow record created once a `BORROW` request is approved, tracking due date, return date, borrow status, and which librarian approved it
+## Key Features Implemented
 
-## Key Features Implemented So Far
-
-- **Borrow requests:** users request to borrow an available book; librarian approval creates a `Library` (borrow) record with a 14-day due date and decrements book stock
-- **Extension requests:** users request a due-date extension on an active borrow; approval extends the due date by 14 days
-- **Return requests:** users initiate a return referencing their active borrow transaction; approval marks the record as returned and restores book stock/availability
-- **Role-based access:** librarian-only endpoints (e.g. approving requests) restricted via Spring Security (`hasAnyRole`)
-- **Librarian dashboard view:** endpoint returning borrowed books grouped by book, with borrower count and each borrower's due date
-- **Book listing page:** frontend page that fetches and renders the book catalog in a table
-
-## Design Decisions
-
-- **Resource-based controller structure:** all transaction request logic (creation by users, approval by librarians) lives in a single `TransactionController` → `TransactionService` → `TransactionRepo`, rather than splitting by which role acts on it — keeps the request's lifecycle in one place.
-- **Approval side-effects wrapped in `@Transactional`:** approving a request can touch `TransactionRequest`, `Library`, and `Books` in one operation, so the whole flow is transactional to avoid inconsistent partial state.
-- **Bidirectional entity relationships (`User` ↔ `Library`) required care around serialization:** `@JsonIgnore` used to prevent infinite recursion in JSON responses, and manual `toString()` overrides used to avoid the same issue when logging/debugging.
-- **DTOs for summary views:** rather than serializing full entities (which leak internal fields and risk recursion), purpose-built DTOs (e.g. `BorrowedBookSummary`, `BorrowerInfo`) are used for read-heavy endpoints, and sensitive fields on `User` (like password) are excluded from API responses via `@JsonIgnore`.
+- **React Single-Page Application:**
+  - **Auth & Session Management:** Modal for Login and Registration, role badges, auto session hydration.
+  - **Book Catalog Browser:** Search books by title/description, filter by category or availability, with direct "Request Borrow" action.
+  - **User Loans & Requests Hub:** View active borrowed books, request 14-day due date extensions, initiate book returns, and track approval status (`PENDING`, `ACCEPTED`, `REJECTED`).
+  - **Librarian Operations Desk:** Queue of pending circulation requests with one-click Approve / Reject, grouped borrows overview, and real-time overdue loan tracking with dynamic fine calculations.
+  - **Admin Console:** User directory management with role promotion (`USER` ↔ `LIBRARIAN` ↔ `ADMIN`) and account locking/unlocking.
+- **Robust Backend APIs:**
+  - Full request-approval workflow (`BORROW`, `EXTEND`, `RETURN`).
+  - Safe catalog CRUD operations (blocking deletion of loaned books).
+  - Unified JSON error responses via `@RestControllerAdvice`.
+  - Automated Mockito and Spring Boot integration test suite.
 
 ## Known Gaps / Next Steps
 
-- Login page and full frontend flows (borrow/extend/return UI, librarian dashboard UI) still in progress
-- Late-return fine calculation not yet implemented
 - JWT-based stateless authentication migration planned once core features are complete
 - Minor naming cleanup planned (e.g. renaming `Library` entity to something like `BorrowRecord` for clarity)
 
 ## Status
 
-Actively in development .
+Actively in development.
+

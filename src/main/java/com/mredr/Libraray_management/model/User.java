@@ -2,6 +2,7 @@ package com.mredr.Libraray_management.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mredr.Libraray_management.model.enums.Role;
 import jakarta.persistence.*;
 
@@ -29,7 +30,7 @@ public class User {
     private Role role;
 
     @Column(nullable = false)
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(nullable = false,columnDefinition = "BOOLEAN DEFAULT TRUE")

@@ -16,15 +16,30 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
+
+    // =========================
+    // GET ALL BOOKS
+    // =========================
+
     @GetMapping("/books")
     public List<Books> getBooks() {
         return bookService.getBooks();
     }
 
+
+    // =========================
+    // GET BOOK BY ID
+    // =========================
+
     @GetMapping("/books/{id}")
-    public Books getBookById(@PathVariable long id) {
+    public Books getBookById(@PathVariable Long id) {
         return bookService.getBookById(id);
     }
+
+
+    // =========================
+    // SEARCH BOOKS
+    // =========================
 
     @GetMapping("/books/search")
     public List<Books> searchBooks(
@@ -32,23 +47,59 @@ public class BookController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) Availability availability
     ) {
-        return bookService.searchBooks(query, category, availability);
+        return bookService.searchBooks(
+                query,
+                category,
+                availability
+        );
     }
+
+
+    // =========================
+    // ADD BOOK
+    // =========================
 
     @PostMapping("/librarian/books")
-    public ResponseEntity<Books> addBook(@RequestBody Books book) {
+    public ResponseEntity<Books> addBook(
+            @RequestBody Books book
+    ) {
+
         Books savedBook = bookService.addBook(book);
-        return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
+
+        return new ResponseEntity<>(
+                savedBook,
+                HttpStatus.CREATED
+        );
     }
 
+
+    // =========================
+    // UPDATE BOOK
+    // =========================
+
     @PutMapping("/librarian/books/{id}")
-    public Books updateBook(@PathVariable long id, @RequestBody Books book) {
+    public Books updateBook(
+            @PathVariable Long id,
+            @RequestBody Books book
+    ) {
+
         return bookService.updateBook(id, book);
     }
 
+
+    // =========================
+    // DELETE BOOK
+    // =========================
+
     @DeleteMapping("/librarian/books/{id}")
-    public ResponseEntity<String> deleteBook(@PathVariable long id) {
+    public ResponseEntity<String> deleteBook(
+            @PathVariable Long id
+    ) {
+
         bookService.deleteBook(id);
-        return ResponseEntity.ok("Book successfully deleted");
+
+        return ResponseEntity.ok(
+                "Book successfully deleted"
+        );
     }
 }

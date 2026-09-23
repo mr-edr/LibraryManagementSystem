@@ -6,12 +6,12 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name="Books")
+@Table(name = "Books")
 public class Books {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -23,33 +23,45 @@ public class Books {
     private Availability availability;
 
     @Column
-    private int stock;
+    private Long stock;
 
     @Column(nullable = false)
     private String category;
 
-    public String getCategory() {
-        return category;
+
+    // =========================
+    // CONSTRUCTORS
+    // =========================
+
+    public Books() {
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public Books(long id, String name, String description, String category, Availability availability, int stock ) {
+    public Books(
+            Long id,
+            String name,
+            String description,
+            String category,
+            Availability availability,
+            Long stock
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.category = category;
         this.availability = availability;
         this.stock = stock;
-        this.category=category;
     }
 
-    public long getId() {
+
+    // =========================
+    // GETTERS & SETTERS
+    // =========================
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -77,17 +89,52 @@ public class Books {
         this.availability = availability;
     }
 
-    public int getStock() {
+    public Long getStock() {
         return stock;
     }
 
-    public void setStock(int stock) {
+    public void setStock(Long stock) {
         this.stock = stock;
     }
 
-    public Books() {
-
+    public String getCategory() {
+        return category;
     }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+
+    // =========================
+    // EQUALS & HASHCODE
+    // =========================
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Books)) {
+            return false;
+        }
+
+        Books other = (Books) o;
+
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+
+    // =========================
+    // TO STRING
+    // =========================
 
     @Override
     public String toString() {
@@ -99,18 +146,5 @@ public class Books {
                 ", stock=" + stock +
                 ", category='" + category + '\'' +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Books)) return false;
-        Books other = (Books) o;
-        return id != 0 && id == other.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 }
